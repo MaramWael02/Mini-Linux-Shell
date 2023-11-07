@@ -16,6 +16,8 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <signal.h>
+#include <fcntl.h>
+
 
 #include "command.h"
 
@@ -146,6 +148,33 @@ Command::execute()
 	// For every simple command fork a new process
 	// Setup i/o redirection
 	// and call exec
+
+	int defaultin = dup( 0 );
+	int defaultout = dup( 1 );
+	int defaulterr = dup( 2 );
+
+	if(_outFile){
+		int outfd = creat( _outFile, 0666 );
+		if ( outfd < 0 ) {
+			perror( "cat_grep: creat outfile" );
+			exit( 2 );
+		}
+		// Redirect output to the created utfile instead off printing to stdout 
+		dup2( outfd, 1 );
+		close( outfd );
+	}
+
+	if(_inputFile){
+		int infd = open( _inputFile, 0666 );
+		if ( infd < 0 ) {
+			perror( "cat_grep: creat outfile" );
+			exit( 2 );
+		}
+		// Redirect output to the created utfile instead off printing to stdout 
+		dup2( infd, 0 );
+		close( infd );
+	}
+
 	for(int i=0 ; i<_numberOfSimpleCommands ; i++){
 		pid_t pid;
 		/* fork a child process */
@@ -154,6 +183,9 @@ Command::execute()
 			fprintf(stderr, "Fork Failed");
 		}
 		else if (pid == 0) { /* child process */
+			close( defaultin );
+			close( defaultout );
+			close( defaulterr );
 
 			execvp(_simpleCommands[i]->_arguments[0], _simpleCommands[i]->_arguments);
 			printf("Child %d Complete\n",i);
@@ -161,6 +193,14 @@ Command::execute()
 		}
 		else { /* parent process */
 			/* parent will wait for the child to complete */
+			dup2( defaultin, 0 );
+			dup2( defaultout, 1 );
+			dup2( defaulterr, 2 );
+
+			// Close file descriptors that are not needed
+			close( defaultin );
+			close( defaultout );
+			close( defaulterr );
 			if (!_background){
 				wait(NULL);
 			}

@@ -155,13 +155,15 @@ Command::execute()
 		}
 		else if (pid == 0) { /* child process */
 
-			execlp(_simpleCommands[i]->_arguments[0], _simpleCommands[i]->_arguments[1]);
+			execvp(_simpleCommands[i]->_arguments[0], _simpleCommands[i]->_arguments);
 			printf("Child %d Complete\n",i);
 
 		}
 		else { /* parent process */
 			/* parent will wait for the child to complete */
-			wait(NULL);
+			if (_background){
+				wait(NULL);
+			}
 			
 			printf("Child Complete\n");
 		}

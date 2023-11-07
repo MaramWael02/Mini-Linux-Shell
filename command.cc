@@ -161,7 +161,7 @@ Command::execute()
 		}
 		else { /* parent process */
 			/* parent will wait for the child to complete */
-			if (_background){
+			if (!_background){
 				wait(NULL);
 			}
 			

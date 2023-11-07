@@ -50,6 +50,9 @@ command: simple_command NEWLINE {
 
 simple_command:	
 	command_and_args iomodifier_opt 
+	| command_and_args NOWAIT{
+		Command::_currentCommand._background = 1;
+	}
 	| NEWLINE 
 	| error NEWLINE { yyerrok; }
 	;
@@ -96,9 +99,6 @@ iomodifier_opt:
 	| GREATX WORD{
 		printf("   Yacc: insert output \"%s\"\n", $2);
 		Command::_currentCommand._outFile = $2;
-	}
-	| NOWAIT {
-		Command::_currentCommand._background = 1;
 	}
 	|
 	;

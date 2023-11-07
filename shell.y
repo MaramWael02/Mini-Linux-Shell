@@ -99,6 +99,7 @@ iomodifier_opt:
 	| GREATX WORD{
 		printf("   Yacc: insert output \"%s\"\n", $2);
 		Command::_currentCommand._outFile = $2;
+		Command::_currentCommand._append = 1;
 	}
 	|
 	;

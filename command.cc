@@ -59,6 +59,7 @@ Command::Command()
 	_inputFile = 0;
 	_errFile = 0;
 	_background = 0;
+	_append= 0;
 }
 
 void
@@ -103,6 +104,7 @@ Command:: clear()
 	_inputFile = 0;
 	_errFile = 0;
 	_background = 0;
+	_append= 0;
 }
 
 void
@@ -123,11 +125,11 @@ Command::print()
 	}
 
 	printf( "\n\n" );
-	printf( "  Output       Input        Error        Background\n" );
-	printf( "  ------------ ------------ ------------ ------------\n" );
-	printf( "  %-12s %-12s %-12s %-12s\n", _outFile?_outFile:"default",
+	printf( "  Output       Input        Error        Background   Append\n" );
+	printf( "  ------------ ------------ ------------ ------------ ---------\n" );
+	printf( "  %-12s %-12s %-12s %-12s %-12s\n", _outFile?_outFile:"default",
 		_inputFile?_inputFile:"default", _errFile?_errFile:"default",
-		_background?"YES":"NO");
+		_background?"YES":"NO", _append?"YES":"NO");
 	printf( "\n\n" );
 	
 }
@@ -152,13 +154,25 @@ Command::execute()
 	int defaultin = dup( 0 );
 	int defaultout = dup( 1 );
 	int defaulterr = dup( 2 );
+	if(_append){
+		int outfd = open(_outFile, O_WRONLY | O_CREAT | O_APPEND, 0777);
+		if (outfd < 0) {
+			perror("cat_grep: open outfile");
+			exit(2);
+		}
+		printf("I am here");
+		// Redirect output to the created outfile instead off printing to stdout 
+		dup2(outfd, 1);
+		close(outfd);
+	}
 
-	if(_outFile){
+	if(_outFile && !_append){
 		int outfd = creat( _outFile, 0666 );
 		if ( outfd < 0 ) {
 			perror( "cat_grep: creat outfile" );
 			exit( 2 );
 		}
+		printf("Overwriting");
 		// Redirect output to the created utfile instead off printing to stdout 
 		dup2( outfd, 1 );
 		close( outfd );

@@ -19,7 +19,6 @@
 #include <fcntl.h>
 
 #include "command.h"
-//idk what to write
 SimpleCommand::SimpleCommand()
 {
 	// Creat available space for 5 arguments

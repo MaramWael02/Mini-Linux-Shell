@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <fcntl.h>
 #include "command.h"
+#include <time.h>
 
 SimpleCommand::SimpleCommand()
 {
@@ -141,8 +142,8 @@ Command::newline()
 }
 
 
-/*void 
-log_file(){
+void
+log_file(int dumm){
 	FILE *fp;
 	time_t now;
 	time(&now);
@@ -151,13 +152,23 @@ log_file(){
         perror("Error opening the log file");
         return;
     }
-
+        
 	struct tm *local = localtime(&now);
+	int hour,min,sec;
+	hour = local->tm_hour;
+	min = local->tm_min;
+	sec = local->tm_sec;
+	if (hour < 12){
+	fprintf(fp,"Child Terminated %02d:%02d:%02d am\n", hour, min, sec);
+	}else{
+	fprintf(fp,"Child Terminated %02d:%02d:%02d pm\n", hour, min, sec);
+	}
+	
 
 
 fclose(fp);
 }
-*/
+
 void
 Command::execute()
 {      
@@ -280,6 +291,7 @@ Command::execute()
 
 			if(!_background){
 				waitpid(pid, 0, 0);
+			signal(SIGCHLD,log_file);
 			}
 		}
 	}

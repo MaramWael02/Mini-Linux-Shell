@@ -1,4 +1,3 @@
-
 /*
  * CS-413 Spring 98
  * shell.y: parser for shell
@@ -39,14 +38,15 @@ goal:
 commands: 
 	command
 	| commands command 
-	
 	;
 
 command: simple_command NEWLINE {
 		printf("   Yacc: Execute command\n");
 		Command::_currentCommand.execute();
 	}
-	        |NEWLINE
+	        |NEWLINE{
+	         Command::_currentCommand.newline();
+	        }
 		|simple_command PIPE command
 		| EXIT{
 	         printf("exit \n\t\t\tGoodByee!!\n");
@@ -59,7 +59,9 @@ simple_command:
 	| command_and_args NOWAIT{
 		Command::_currentCommand._background = 1;
 	}
-	| NEWLINE 
+	/*| NEWLINE{
+	         Command::_currentCommand._newline = 1;
+	        }*/
 	| error NEWLINE { yyerrok; }
 	;
 

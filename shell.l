@@ -33,6 +33,9 @@
 "<" 	{
 		return LESS;
 	}
+"exit"  {
+		return EXIT;
+	}
 "&" 	{
 		return NOWAIT;
 	}

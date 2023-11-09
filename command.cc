@@ -17,8 +17,8 @@
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
-
 #include "command.h"
+
 SimpleCommand::SimpleCommand()
 {
 	// Creat available space for 5 arguments
@@ -134,7 +134,7 @@ Command::print()
 
 void
 Command::execute()
-{
+{      
 	// Don't do anything if there are no simple commands
 	if ( _numberOfSimpleCommands == 0 ) {
 		prompt();
@@ -230,7 +230,6 @@ Command::execute()
 }
 
 // Shell implementation
-
 void
 Command::prompt()
 {
@@ -242,12 +241,20 @@ Command Command::_currentCommand;
 SimpleCommand * Command::_currentSimpleCommand;
 
 int yyparse(void);
-
+void sig_handler(int signal)
+{
+   //system("stty -echoctl");
+}
 int 
 main()
 {
-	Command::_currentCommand.prompt();
+        
+        signal(SIGINT, SIG_IGN);
+        //system("stty -werase");
+        //clear();
+	Command::_currentCommand.prompt();	
 	yyparse();
+       // system("stty echoctl");
 	return 0;
 }
 

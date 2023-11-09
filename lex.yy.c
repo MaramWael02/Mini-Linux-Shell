@@ -362,8 +362,8 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[18] =
     {   0,
-        0,    0,   12,    9,    2,    1,    7,    5,    3,    9,
-        8,    9,    4,    9,    9,    6,    0
+        0,    0,   12,    9,    2,    1,    6,    5,    3,    9,
+        8,    9,    4,    9,    9,    7,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -400,20 +400,20 @@ static const YY_CHAR yy_ec[256] =
 
 static const YY_CHAR yy_meta[12] =
     {   0,
-        1,    2,    2,    1,    1,    1,    1,    1,    1,    1,
-        1
+        1,    2,    2,    2,    2,    2,    1,    1,    1,    1,
+        2
     } ;
 
 static const flex_int16_t yy_base[19] =
     {   0,
-        0,    0,   17,    0,   18,   18,    0,    0,   10,    5,
-        0,    0,    0,    6,    4,    0,   18,   11
+        0,    0,   17,    0,   18,   18,   18,   18,   10,    5,
+       18,    0,   18,    6,    4,    0,   18,   11
     } ;
 
 static const flex_int16_t yy_def[19] =
     {   0,
-       17,    1,   17,   18,   17,   17,   18,   18,   18,   18,
-       18,   18,   18,   18,   18,   18,    0,   17
+       17,    1,   17,   18,   17,   17,   17,   17,   17,   18,
+       17,   18,   17,   18,   18,   18,    0,   17
     } ;
 
 static const flex_int16_t yy_nxt[30] =
@@ -775,14 +775,14 @@ case 6:
 YY_RULE_SETUP
 #line 36 "shell.l"
 {
-		return EXIT;
+		return NOWAIT;
 	}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 39 "shell.l"
 {
-		return NOWAIT;
+		return EXIT;
 	}
 	YY_BREAK
 case 8:

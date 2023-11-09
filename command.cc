@@ -194,7 +194,7 @@ Command::execute()
 			}
 			else{
 				dup2(defaultin, 0);
-				close(defaultin);
+				//close(defaultin);
 			}
 		// Output Redirection
 			if(_numberOfSimpleCommands > 1){ // If there is more than one command then there must be a pipe
@@ -235,7 +235,7 @@ Command::execute()
 				}
 				else{ // default system output
 					dup2(defaultout, 1);
-					close(defaultout);
+					//close(defaultout);
 				}
 
 		}
@@ -260,11 +260,14 @@ Command::execute()
 		else{
 			dup2(defaultin,0);
 			dup2(defaultout,1);
+
 			if(!_background){
 				waitpid(pid, 0, 0);
 			}
 		}
 	}
+	close( defaultin );
+	close( defaultout );
 	// Clear to prepare for next command
 	clear();
 	

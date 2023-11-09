@@ -46,6 +46,7 @@ command: simple_command NEWLINE {
 		printf("   Yacc: Execute command\n");
 		Command::_currentCommand.execute();
 	}
+	        |NEWLINE
 		|simple_command PIPE command
 		| EXIT{
 	         printf("exit \n\t\t\tGoodByee!!\n");

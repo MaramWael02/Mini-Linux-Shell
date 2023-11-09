@@ -13,7 +13,7 @@
 
 %token	<string_val> WORD
 
-%token 	NOTOKEN GREAT NEWLINE PIPE GREATX LESS NOWAIT
+%token 	NOTOKEN GREAT NEWLINE PIPE GREATX LESS NOWAIT EXIT
 
 %union	{
 		char   *string_val;
@@ -39,6 +39,7 @@ goal:
 commands: 
 	command
 	| commands command 
+	
 	;
 
 command: simple_command NEWLINE {
@@ -46,6 +47,10 @@ command: simple_command NEWLINE {
 		Command::_currentCommand.execute();
 	}
 		|simple_command PIPE command
+		| EXIT{
+	         printf("exit \n\t\t\tGoodByee!!\n");
+	         exit(1);
+	}
         ;
 
 simple_command:	
@@ -85,6 +90,7 @@ command_word:
 	       Command::_currentSimpleCommand = new SimpleCommand();
 	       Command::_currentSimpleCommand->insertArgument( $1 );
 	}
+	
 	;
 
 iomodifier_opt:

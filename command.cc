@@ -55,6 +55,7 @@ Command::Command()
 		malloc( _numberOfSimpleCommands * sizeof( SimpleCommand * ) );
 
 	_numberOfSimpleCommands = 0;
+	_numberOfPipes = 0;
 	_outFile = 0;
 	_inputFile = 0;
 	_errFile = 0;
@@ -73,6 +74,7 @@ Command::insertSimpleCommand( SimpleCommand * simpleCommand )
 	
 	_simpleCommands[ _numberOfSimpleCommands ] = simpleCommand;
 	_numberOfSimpleCommands++;
+	_numberOfPipes++;
 }
 
 void
@@ -105,6 +107,7 @@ Command:: clear()
 	_errFile = 0;
 	_background = 0;
 	_append= 0;
+	_numberOfPipes = 0;
 }
 
 void
@@ -150,80 +153,103 @@ Command::execute()
 	// For every simple command fork a new process
 	// Setup i/o redirection
 	// and call exec
-
 	int defaultin = dup( 0 );
 	int defaultout = dup( 1 );
 	int defaulterr = dup( 2 );
-	if(_append){
-		int outfd = open(_outFile, O_WRONLY | O_CREAT | O_APPEND, 0777);
-		if (outfd < 0) {
-			perror("cat_grep: open outfile");
+	int infd, outfd;
+	int fdpipe[_numberOfPipes][2];
+	// Redirection part
+	for(int i=0 ; i<_numberOfSimpleCommands ; i++){
+		printf("Iteration %d\n",i);
+		if ( pipe(fdpipe[i]) == -1) {
+			perror( "cat_grep: pipe");
+			exit( 2 );
+		}
+		if (i == 0)
+		{ 
+		// Input Redirection
+			if (_inputFile){
+				infd = open( _inputFile, 0666 );
+				if ( infd < 0 ) { // read from a file
+					perror( "cat_grep: creat outfile" );
+					exit( 2 );
+				}
+				dup2(infd, 0);
+				close(infd);
+			}
+			else{
+				dup2(defaultin, 0);
+				close(defaultin);
+			}
+		// Output Redirection
+			if(_numberOfSimpleCommands > 1){ // If there is more than one command then there must be a pipe
+				dup2(fdpipe[i][1],1);
+				close(fdpipe[i][1]);
+			}
+		}
+
+
+		else if ( i == _numberOfSimpleCommands-1){
+			// input redirection
+				if(_numberOfSimpleCommands > 1){
+				dup2(fdpipe[i-1][0], 0);
+				close(fdpipe[i-1][0]);
+				}
+			// Output Redirection
+				if(_append){ // append to a file
+				outfd = open(_outFile, O_WRONLY | O_CREAT | O_APPEND, 0777);
+				if (outfd < 0) {
+					perror("cat_grep: open outfile");
+					exit(2);
+				}
+				printf("I am here");
+				// Redirect output to the created outfile instead off printing to stdout 
+				dup2(outfd, 1);
+				close(outfd);
+				}
+
+				else if(_outFile){  // rewrite on a file
+					int outfd = creat( _outFile, 0666 );
+					if ( outfd < 0 ) {
+						perror( "cat_grep: creat outfile" );
+						exit( 2 );
+					}
+					// Redirect output to the created utfile instead off printing to stdout 
+					dup2( outfd, 1 );
+					close( outfd );
+				}
+				else{ // default system output
+					dup2(defaultout, 1);
+					close(defaultout);
+				}
+
+		}
+		else{ // Middle Command
+			dup2(fdpipe[i-1][0],0);
+			close(fdpipe[i-1][0]);
+			dup2(fdpipe[i][1],1);
+			close(fdpipe[i][1]);
+		}
+		// Forking
+
+		pid_t pid = fork();
+		if (pid < 0){
+			perror("Fork Failed");
 			exit(2);
 		}
-		printf("I am here");
-		// Redirect output to the created outfile instead off printing to stdout 
-		dup2(outfd, 1);
-		close(outfd);
-	}
-
-	if(_outFile && !_append){
-		int outfd = creat( _outFile, 0666 );
-		if ( outfd < 0 ) {
-			perror( "cat_grep: creat outfile" );
-			exit( 2 );
-		}
-		printf("Overwriting");
-		// Redirect output to the created utfile instead off printing to stdout 
-		dup2( outfd, 1 );
-		close( outfd );
-	}
-
-	if(_inputFile){
-		int infd = open( _inputFile, 0666 );
-		if ( infd < 0 ) {
-			perror( "cat_grep: creat outfile" );
-			exit( 2 );
-		}
-		// Redirect output to the created utfile instead off printing to stdout 
-		dup2( infd, 0 );
-		close( infd );
-	}
-
-	for(int i=0 ; i<_numberOfSimpleCommands ; i++){
-		pid_t pid;
-		/* fork a child process */
-		pid = fork();
-		if (pid < 0) { /* error occurred */
-			fprintf(stderr, "Fork Failed");
-		}
-		else if (pid == 0) { /* child process */
-			close( defaultin );
-			close( defaultout );
-			close( defaulterr );
-
+		else if (pid == 0)
+		{
 			execvp(_simpleCommands[i]->_arguments[0], _simpleCommands[i]->_arguments);
-			printf("Child %d Complete\n",i);
 
 		}
-		else { /* parent process */
-			/* parent will wait for the child to complete */
-			dup2( defaultin, 0 );
-			dup2( defaultout, 1 );
-			dup2( defaulterr, 2 );
-
-			// Close file descriptors that are not needed
-			close( defaultin );
-			close( defaultout );
-			close( defaulterr );
-			if (!_background){
-				wait(NULL);
+		else{
+			dup2(defaultin,0);
+			dup2(defaultout,1);
+			if(!_background){
+				waitpid(pid, 0, 0);
 			}
-			
-			printf("Child Complete\n");
 		}
-
 	}
-
 	// Clear to prepare for next command
 	clear();
 	

@@ -14,6 +14,7 @@ struct SimpleCommand {
 	
 	SimpleCommand();
 	void insertArgument( char * argument );
+	
 };
 
 struct Command {
@@ -25,7 +26,7 @@ struct Command {
 	char * _errFile;
 	int _background;
 	int _append;
-
+	int _numberOfPipes;
 	void prompt();
 	void print();
 	void execute();

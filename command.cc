@@ -158,6 +158,17 @@ Command::execute()
 	int fdpipe[_numberOfPipes][2];
 	// Redirection part
 	for(int i=0 ; i<_numberOfSimpleCommands ; i++){
+		if (strcmp(_simpleCommands[i]->_arguments[0], "cd") == 0){
+			if(_simpleCommands[i]->_arguments[1] == NULL){
+				chdir(getenv("HOME"));
+			}
+			else{
+				chdir(_simpleCommands[i]->_arguments[1]);
+			}
+			clear();
+			prompt();
+			return;
+		}
 		printf("Iteration %d\n",i);
 		if ( pipe(fdpipe[i]) == -1) {
 			perror( "cat_grep: pipe");
@@ -259,8 +270,14 @@ Command::execute()
 void
 Command::prompt()
 {
-	printf("myshell>");
-	fflush(stdout);
+	char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("myshell %s> ", cwd);
+    } else {
+        perror("getcwd() error");
+    }
+	//printf("myshell>");
+	//fflush(stdout);
 }
 
 Command Command::_currentCommand;

@@ -134,6 +134,12 @@ Command::print()
 	printf( "\n\n" );
 	
 }
+void 
+Command::newline()
+{
+   prompt();
+}
+
 
 void
 Command::execute()
@@ -300,4 +306,3 @@ main()
        // system("stty echoctl");
 	return 0;
 }
-

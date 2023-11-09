@@ -27,10 +27,12 @@ struct Command {
 	int _background;
 	int _append;
 	int _numberOfPipes;
+	
 	void prompt();
 	void print();
 	void execute();
 	void clear();
+	void newline();
 	
 	Command();
 	void insertSimpleCommand( SimpleCommand * simpleCommand );

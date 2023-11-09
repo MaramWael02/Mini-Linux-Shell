@@ -141,6 +141,23 @@ Command::newline()
 }
 
 
+/*void 
+log_file(){
+	FILE *fp;
+	time_t now;
+	time(&now);
+	fp = fopen("log_file.txt","w");
+	if (fp == NULL) {
+        perror("Error opening the log file");
+        return;
+    }
+
+	struct tm *local = localtime(&now);
+
+
+fclose(fp);
+}
+*/
 void
 Command::execute()
 {      
@@ -295,13 +312,14 @@ SimpleCommand * Command::_currentSimpleCommand;
 int yyparse(void);
 void sig_handler(int signal)
 {
-   //system("stty -echoctl");
+   system("stty -echoctl");
+   //system("stty -werase");
 }
 int 
 main()
 {
         
-        signal(SIGINT, SIG_IGN);
+        signal(SIGINT, sig_handler);
         //system("stty -werase");
         //clear();
 	Command::_currentCommand.prompt();	

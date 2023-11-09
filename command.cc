@@ -324,6 +324,6 @@ main()
         //clear();
 	Command::_currentCommand.prompt();	
 	yyparse();
-       // system("stty echoctl");
+       system("stty echoctl");
 	return 0;
 }

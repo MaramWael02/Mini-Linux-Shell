@@ -232,7 +232,7 @@ Command::execute()
 		}
 
 
-		else if ( i == _numberOfSimpleCommands-1){
+		if ( i == _numberOfSimpleCommands-1){
 			// input redirection
 				if(_numberOfSimpleCommands > 1){
 				dup2(fdpipe[i-1][0], 0);
@@ -295,6 +295,7 @@ Command::execute()
 			}
 		}
 	}
+	
 	close( defaultin );
 	close( defaultout );
 	// Clear to prepare for next command

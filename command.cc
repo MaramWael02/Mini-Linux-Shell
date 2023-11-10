@@ -316,12 +316,12 @@ void Command::execute()
 			dup2(defaultin, 0);
 			dup2(defaultout, 1);
 
+			global_pid=pid;
+			signal(SIGCHLD, log_file);
 			if (!_background)
 			{
 				waitpid(pid, 0, 0);
 			}
-			global_pid=pid;
-			signal(SIGCHLD, log_file);
 		}
 	}
 

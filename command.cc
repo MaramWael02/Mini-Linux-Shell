@@ -212,14 +212,14 @@ void Command::execute()
         if (status == 0) {
             // Iterate through the matched filenames
             for (size_t j = 0; j < results.gl_pathc; ++j) {
-                printf("%s ", results.gl_pathv[j]);
+                printf("%s\n", results.gl_pathv[j]);
             }
 
             // Free the memory allocated by glob
             globfree(&results);
         } else if (status == GLOB_NOMATCH) {
             // If no match, print the original argument
-            printf("%s ", _simpleCommands[i]->_arguments[1]);
+            printf("%s\n", _simpleCommands[i]->_arguments[1]);
         } else {
             perror("Error during wildcard expansion");
         }

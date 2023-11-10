@@ -147,7 +147,7 @@ log_file(int dumm){
 	FILE *fp;
 	time_t now;
 	time(&now);
-	fp = fopen("log_file.txt","w");
+	fp = fopen("log_file.txt","a");
 	if (fp == NULL) {
         perror("Error opening the log file");
         return;

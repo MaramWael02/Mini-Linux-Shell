@@ -19,7 +19,7 @@
 #include <fcntl.h>
 #include "command.h"
 #include <time.h>
-
+#include <glob.h>
 SimpleCommand::SimpleCommand()
 {
 	// Creat available space for 5 arguments
@@ -202,6 +202,32 @@ void Command::execute()
 	for (int i = 0; i < _numberOfSimpleCommands; i++)
 	{
 		// handling cd [dir]
+		if (strcmp(_simpleCommands[i]->_arguments[0], "echo") == 0)
+		{
+			glob_t results;
+
+        // Perform wildcard expansion for the given argument
+        int status = glob(_simpleCommands[i]->_arguments[1], GLOB_NOCHECK, NULL, &results);
+
+        if (status == 0) {
+            // Iterate through the matched filenames
+            for (size_t j = 0; j < results.gl_pathc; ++j) {
+                printf("%s ", results.gl_pathv[j]);
+            }
+
+            // Free the memory allocated by glob
+            globfree(&results);
+        } else if (status == GLOB_NOMATCH) {
+            // If no match, print the original argument
+            printf("%s ", _simpleCommands[i]->_arguments[1]);
+        } else {
+            perror("Error during wildcard expansion");
+        }
+			printf("\n");
+			clear();
+			prompt();
+			return;
+		}
 		if (strcmp(_simpleCommands[i]->_arguments[0], "cd") == 0)
 		{
 			if (_simpleCommands[i]->_arguments[1] == NULL)

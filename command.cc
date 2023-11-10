@@ -143,17 +143,20 @@ void Command::newline()
 {
 	prompt();
 }
+// global variable
+int global_pid;
 
 void log_file(int dumm)
 {
 	FILE *fp;
 	time_t now;
-	int pid = getpid();
+	int pid = global_pid;
 	time(&now);
 	fp = fopen("log_file.txt", "a");
 	if (fp == NULL)
 	{
 		perror("Error opening the log file");
+		printf("Error opening the log file");
 		return;
 	}
 
@@ -317,6 +320,7 @@ void Command::execute()
 			{
 				waitpid(pid, 0, 0);
 			}
+			global_pid=pid;
 			signal(SIGCHLD, log_file);
 		}
 	}

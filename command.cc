@@ -201,7 +201,7 @@ void Command::execute()
 	// Redirection part
 	for (int i = 0; i < _numberOfSimpleCommands; i++)
 	{
-		// handling cd [dir]
+		// handling wildcard
 		if (strcmp(_simpleCommands[i]->_arguments[0], "echo") == 0)
 		{
 			glob_t results;
@@ -217,10 +217,7 @@ void Command::execute()
 
             // Free the memory allocated by glob
             globfree(&results);
-        } else if (status == GLOB_NOMATCH) {
-            // If no match, print the original argument
-            printf("%s\n", _simpleCommands[i]->_arguments[1]);
-        } else {
+        }  else {
             perror("Error during wildcard expansion");
         }
 			printf("\n");
@@ -228,6 +225,7 @@ void Command::execute()
 			prompt();
 			return;
 		}
+		// handling cd [dir]
 		if (strcmp(_simpleCommands[i]->_arguments[0], "cd") == 0)
 		{
 			if (_simpleCommands[i]->_arguments[1] == NULL)
@@ -242,7 +240,7 @@ void Command::execute()
 			prompt();
 			return;
 		}
-		// handling othe commands than cd
+		// handling other commands with wildcard
 		printf("Iteration %d\n", i);
 		if (pipe(fdpipe[i]) == -1)
 		{
